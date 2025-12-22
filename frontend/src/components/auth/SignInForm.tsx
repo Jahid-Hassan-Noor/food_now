@@ -44,7 +44,7 @@ export default function SignInForm() {
                 try {
                     const isValid = await checkAccess();
                     if (isValid) {
-                        router.push('/user'); // Redirect to user dashboard if valid
+                        router.push('/chef'); // Redirect to user dashboard if valid
                     } else {
                         setError('Session expired. Please login again.');
                         setShowErrorModal(true);

@@ -36,7 +36,7 @@ from admin_app.models import Profile
 
 # Create your views here.
 
-class Dashboad(APIView):
+class user_dashboad(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         user = request.user

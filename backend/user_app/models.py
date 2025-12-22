@@ -7,16 +7,39 @@ from core.models import core_model
 
 # Create your models here.
 
-class Food(core_model):
-    food_name = models.CharField(max_length=100, default="Food Name")
-    food_description = models.TextField(blank=True, null=True)
-    chef = models.CharField(max_length=100, default="Chef Name")
-    food_price = models.FloatField(default=0)
-    food_image = models.ImageField(upload_to='food_images/', default='food_images/default.png')
+
+class Campaign(core_model):
+    chef = models.CharField(max_length=100, default="Chef Username")
+    status = models.CharField(max_length=100, default="running")
+    food_status = models.CharField(max_length=100, default="cooking")
+    title = models.CharField(max_length=100, default="Campaign Title")
+    campaign_description = models.TextField(blank=True, null=True)
+    food_ids = models.TextField(blank=True, null=True, default="Food IDs(comma separated)")
+    start_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    end_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    delivery_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    quantity_available = models.IntegerField(default=0)
+    total_orders = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.food_name
-    
+        return self.title
+
+
+class Campaign_history(core_model):
+    chef = models.CharField(max_length=100, default="Chef Username")
+    status = models.CharField(max_length=100, default="active")
+    title = models.CharField(max_length=100, default="Campaign Title")
+    campaign_description = models.TextField(blank=True, null=True)
+    food_ids = models.TextField(blank=True, null=True, default="Food IDs(comma separated)")
+    start_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    end_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    delivery_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    total_orders = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+
 class Chef(core_model):
     chef_username = models.CharField(max_length=100, default="Chef Name")
     chef_description = models.TextField(blank=True, null=True)
@@ -48,36 +71,16 @@ class Chef(core_model):
 
 
 
-class Campaign(core_model):
-    chef = models.CharField(max_length=100, default="Chef Username")
-    status = models.CharField(max_length=100, default="active")
-    food_status = models.CharField(max_length=100, default="cooking")
-    title = models.CharField(max_length=100, default="Campaign Title")
-    campaign_description = models.TextField(blank=True, null=True)
-    food_ids = models.TextField(blank=True, null=True, default="Food IDs(comma separated)")
-    start_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    end_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    delivery_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    quantity_available = models.IntegerField(default=0)
-    total_orders = models.IntegerField(default=0)
+class Food(core_model):
+    food_name = models.CharField(max_length=100, default="Food Name")
+    food_description = models.TextField(blank=True, null=True)
+    chef = models.CharField(max_length=100, default="Chef Name")
+    food_price = models.FloatField(default=0)
+    food_image = models.ImageField(upload_to='food_images/', default='food_images/default.png')
 
     def __str__(self):
-        return self.title
-
-
-class Campaign_history(core_model):
-    chef = models.CharField(max_length=100, default="Chef Username")
-    status = models.CharField(max_length=100, default="active")
-    title = models.CharField(max_length=100, default="Campaign Title")
-    campaign_description = models.TextField(blank=True, null=True)
-    food_ids = models.TextField(blank=True, null=True, default="Food IDs(comma separated)")
-    start_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    end_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    delivery_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    total_orders = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.title
+        return self.food_name
+    
 
 class Order(core_model):
     user = models.CharField(max_length=100)
