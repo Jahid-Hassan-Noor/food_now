@@ -31,19 +31,35 @@ class available(APIView):
             return Response({
                 'message': 'You are not authorized to access this page'
             }, status=status.HTTP_403_FORBIDDEN)
-        
-        metrices = {
-            'balance': chef.balance,
-            'total_orders_received': chef.total_orders_received,
-            'total_campaigns': chef.total_campaigns,
-            'campaign_points': chef.campaign_points,
-        }
-        # all_chefs = Chef.objects.all()
-        # paginator = PageNumberPagination()
-        # paginated_chefs = paginator.paginate_queryset(all_chefs, request)
-        # chef_serializer = ChefSerializer(paginated_chefs, many=True)
+
+        # Prepare campaigns data with food items and their campaign-specific quantities
+        from user_app.models import Food
+        from admin_app.serializers import FoodSerializer
+        campaigns_data = []
+        for campaign in available_campaigns:
+            food_items = campaign.food_items or {}
+            food_items_list = []
+            for fid, quantity in food_items.items():
+                try:
+                    food = Food.objects.get(pk=fid)
+                    food_data = FoodSerializer(food).data
+                    food_data['campaign_quantity'] = quantity
+                    food_items.append(food_data)
+                except Food.DoesNotExist:
+                    continue
+            campaigns_data.append({
+                'id': str(campaign.uid),
+                'title': campaign.title,
+                'description': campaign.campaign_description,
+                'chef': campaign.chef,
+                'start_time': campaign.start_time,
+                'end_time': campaign.end_time,
+                'delivery_time': campaign.delivery_time,
+                'quantity_available': campaign.quantity_available,
+                'food_items': food_items,
+            })
 
         return Response({
-            'metrices': metrices,
-            # 'chefs': chef_serializer.data,
-            'status': status.HTTP_200_OK,})
+            'campaigns': campaigns_data,
+            'status': status.HTTP_200_OK,
+        })

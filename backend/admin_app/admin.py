@@ -28,4 +28,5 @@ class Transaction_historyAdmin(admin.ModelAdmin):
 admin.site.register(Pending_transaction, Pending_transactionAdmin),
 admin.site.register(Transaction_history, Transaction_historyAdmin),
 admin.site.register(Profile)
+admin.site.register(Subscription_option)
 admin.site.register(Setting, SettingAdmin)

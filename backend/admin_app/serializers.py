@@ -81,6 +81,12 @@ class SettingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SubscriptionOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription_option
+        fields = '__all__'
+
+
 class Transaction_historySerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction_history

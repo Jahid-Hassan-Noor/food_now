@@ -5,15 +5,16 @@ from django.urls import path
 from admin_app.views import *
 
 
-# urlpatterns = [
-#     # Dashboard
-#     path('admin_dashboard', admin_dashboard , name='admin_dashboard'),
-#     # Settings 
-#     path('admin_settings', admin_settings , name='admin_settings'),
-#     path('admin_update_website_settings', admin_update_website_settings , name='admin_update_website_settings'),
-#     path('admin_update_website_details', admin_update_website_details , name='admin_update_website_details'),
-#     path('admin_update_apis', admin_update_apis , name='admin_update_apis'),
-#     # Profile
-#     path('admin_profile', admin_profile , name='admin_profile'),
-
-# ]
+urlpatterns = [
+	path('register/', register.as_view()),
+	path('login/', login.as_view()),
+	path('announcements/', Announcements.as_view()),
+	path('settings/', AppSettings.as_view()),
+	path('dashboard/', AdminDashboard.as_view()),
+	path('subscriptions/', SubscriptionOptionListCreate.as_view()),
+	path('subscriptions/<int:pk>/', SubscriptionOptionDetail.as_view()),
+	path('available_subscriptions/', AvailableSubscriptions.as_view()),
+	path('transactions/', Transactions.as_view()),
+	path('users/', UsersList.as_view()),
+	path('chefs/', Chefs.as_view()),
+]

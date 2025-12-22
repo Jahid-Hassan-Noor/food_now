@@ -77,3 +77,14 @@ class Setting(models.Model):
     def __str__(self):
         return self.setting_name
 
+
+class Subscription_option(models.Model):
+    name = models.CharField(max_length=100)
+    duration_months = models.PositiveIntegerField()
+    price = models.FloatField()
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.duration_months} months)"

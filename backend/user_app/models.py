@@ -14,7 +14,7 @@ class Campaign(core_model):
     food_status = models.CharField(max_length=100, default="cooking")
     title = models.CharField(max_length=100, default="Campaign Title")
     campaign_description = models.TextField(blank=True, null=True)
-    food_ids = models.TextField(blank=True, null=True, default="Food IDs(comma separated)")
+    food_items = models.JSONField(default=dict, blank=True, null=True)
     start_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
     end_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
     delivery_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
