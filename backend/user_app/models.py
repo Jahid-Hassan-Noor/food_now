@@ -88,6 +88,7 @@ class Order(core_model):
     user_phone = models.CharField(max_length=15, default="User Phone")
     quantity = models.IntegerField(default=0)
     food_items = models.TextField(blank=True, null=True)
+    custom_order_details = models.TextField(blank=True, null=True)
     food_price = models.FloatField(default=0)
     order_time = models.DateTimeField(auto_now_add=True)
 

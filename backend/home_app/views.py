@@ -1,79 +1,71 @@
 # home_app/views.py
 
 
-from django.shortcuts import render, redirect
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from user_app.models import Campaign, Food, Chef, Order
+from admin_app.models import Profile
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponse
-from admin_app.models import Profile, Setting, send_password_reset_email
-import uuid
-from datetime import datetime, timedelta
-from user_app.models import Campaign
-from django.db.models import Q
+from admin_app.serializers import CampaignSerializer, FoodSerializer, ChefSerializer
+from django.utils import timezone
 
-# Create your views here.
+class home(APIView):
+    def get(self, request):
+        now = timezone.now()
+        # Running campaigns
+        running_campaigns = Campaign.objects.filter(status="running", start_time__lte=now, end_time__gte=now, quantity_available__gte=1).order_by('-start_time')
+        campaigns_data = []
+        for campaign in running_campaigns:
+            food_items = []
+            food_quantities = campaign.food_quantities or {}
+            for fid, quantity in food_quantities.items():
+                try:
+                    food = Food.objects.get(pk=fid)
+                    food_data = FoodSerializer(food).data
+                    food_data['campaign_quantity'] = quantity
+                    food_items.append(food_data)
+                except Food.DoesNotExist:
+                    continue
+            campaigns_data.append({
+                'id': str(campaign.uid),
+                'title': campaign.title,
+                'description': campaign.campaign_description,
+                'chef': campaign.chef,
+                'start_time': campaign.start_time,
+                'end_time': campaign.end_time,
+                'delivery_time': campaign.delivery_time,
+                'food_items': food_items,
+            })
+
+        # Featured/Popular food items (by order count)
+        food_order_counts = {}
+        for order in Order.objects.all():
+            if order.food_items:
+                food_ids = [fid.strip() for fid in order.food_items.split(',') if fid.strip()]
+                for fid in food_ids:
+                    food_order_counts[fid] = food_order_counts.get(fid, 0) + order.quantity
+        popular_food_ids = sorted(food_order_counts, key=food_order_counts.get, reverse=True)[:5]
+        popular_foods = [FoodSerializer(Food.objects.get(pk=fid)).data for fid in popular_food_ids if Food.objects.filter(pk=fid).exists()]
+
+        # Top chefs (by total_campaigns and sales)
+        top_chefs = Chef.objects.order_by('-total_campaigns', '-this_month_sales')[:5]
+        top_chefs_data = ChefSerializer(top_chefs, many=True).data
+
+        # Statistics
+        stats = {
+            'total_campaigns_running': running_campaigns.count(),
+            'total_food_items_available': Food.objects.count(),
+            'total_users': User.objects.count(),
+            'total_chefs': Chef.objects.count(),
+        }
+
+        return Response({
+            'campaigns': campaigns_data,
+            'featured_foods': popular_foods,
+            'top_chefs': top_chefs_data,
+            'statistics': stats,
+            'status': status.HTTP_200_OK,
+        })
 
 
-                        #  Home View 
-
-def home(request):
-
-    # Getting Features for Home Page
-    # available_now = Campaign.objects.filter(Q(status="active") & Q(start_time__lte=datetime.now()) & Q(end_time__gte=datetime.now()) & Q(quantity_available__gte=0)).order_by('-start_time')
-
-    # context = { 
-    #             'available_now': available_now,
-    #            }
-        
-    # return render(request , "home/index.html", context)
-
-    return HttpResponse("This is the home page. Available now feature is commented out for now.")
-
-
-
-                        # Password Reset Views
-# # Password Reset View
-# def password_reset(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-
-#         email_check = User.objects.filter(email=email)
-#         if not email_check.exists():
-#             messages.error(request, "Account not Found.")
-#             return HttpResponseRedirect(request.path_info)
-
-#         user = User.objects.get( email = email)
-#         user_id = user.pk
-#         profile = Profile.objects.get( user = user_id )
-#         user_uid = profile.uid
-#         current_site = Site.objects.get_current()
-#         try:
-#             password_reset_token = str(uuid.uuid4())[:20]
-#             Profile.objects.filter( uid = user_uid ).update( 
-
-#                 password_reset_token = password_reset_token,
-
-#             )
-#             send_password_reset_email(email, password_reset_token, current_site)
-#             messages.success(request, "Email sent successfully.")
-#             return HttpResponseRedirect(request.path_info)
-#         except Exception as e:
-#             print(e)
-#             return HttpResponse("Email address not found.")
-
-#     return render(request , "home/password_reset.html")
-
-
-
-# def reset_your_password(request, password_reset_token):
-#     userprofile = Profile.objects.get(password_reset_token = password_reset_token)
-#     user = User.objects.get(username = userprofile)
-#     fm = SetPasswordForm( user = user)
-#     if request.method == 'POST':
-#         fm = SetPasswordForm(user = user , data = request.POST)
-#         if fm.is_valid():
-#             fm.save()
-#             messages.success(request, "Your Password was reset successfully.")
-#             return redirect('/')
-#     return render(request , "home/change_password.html", {"form" : fm})
