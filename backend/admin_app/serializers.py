@@ -3,6 +3,13 @@ from django.contrib.auth.models import User
 from home_app.models import *
 from user_app.models import *
 from admin_app.models import *
+from notifications.models import *
+
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = '__all__'
 
 
 class CampaignSerializer(serializers.ModelSerializer):

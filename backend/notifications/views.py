@@ -1,95 +1,120 @@
 # notifications/views.py
 
-
-from django.shortcuts import render, redirect
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
-from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponseRedirect, HttpResponse
-from home_app.models import *
-from notifications.models import *
+from admin_app.models import Profile
+from notifications.models import Notification
+
 
 # Create your views here.
-@staff_member_required(login_url='error500')
-def send_notification_to_all(request):
-    all_users = User.objects.all()
+class SendNotificationToAll(APIView):
+    permission_classes = [IsAuthenticated]
 
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        message = request.POST.get('message')
+    def post(self, request):
+        title = request.data.get('title')
+        message = request.data.get('message')
 
+        if not title or not message:
+            return Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': 'Title and message are required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        all_users = User.objects.all()
+        
         for user in all_users:
-
             username = user.username
-
             # Create new notification
-            create_new_notification = Notification( 
-                sender = "Admin",
-                username = username,
-                title = title,
-                message = message,
-                )
-            create_new_notification.save()
+            Notification.objects.create(
+                sender="Admin",
+                username=username,
+                title=title,
+                message=message,
+            )
 
-        messages.success(request, "Send Successfully.")
-        return HttpResponseRedirect(request.path_info)
+        return Response({
+            'status': status.HTTP_200_OK,
+            'message': 'Notifications sent successfully.'
+        }, status=status.HTTP_200_OK)
 
-    return render(request , "manager/notifications_to_all.html")
 
+class SendNotificationToChefs(APIView):
+    permission_classes = [IsAuthenticated]
 
-@staff_member_required(login_url='error500')
-def send_notification_to_chefs(request):
-    all_chefs = Profile.objects.filter( role = "Chef" )
-    if not all_chefs.exists():
-        messages.error(request, "No chefs found.")
-        return redirect("manager_send_notifications")
+    def post(self, request):
+        title = request.data.get('title')
+        message = request.data.get('message')
 
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        country = request.POST.get('country')
-        message = request.POST.get('message')
+        if not title or not message:
+            return Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': 'Title and message are required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
+        all_chefs = Profile.objects.filter(role="Chef")
+        
+        if not all_chefs.exists():
+            return Response({
+                'status': status.HTTP_404_NOT_FOUND,
+                'message': 'No chefs found.'
+            }, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            for user in all_chefs:
-                username = user.user.username
-
+            for chef_profile in all_chefs:
+                username = chef_profile.user.username
                 # Create new notification
-                create_new_notification = Notification( 
-                    sender = "Admin",
-                    username = username,
-                    title = title,
-                    message = message,
-                    )
-                create_new_notification.save()
-
+                Notification.objects.create(
+                    sender="Admin",
+                    username=username,
+                    title=title,
+                    message=message,
+                )
         except Exception as e:
-            print(e)
+            return Response({
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                'message': f'Error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        messages.success(request, "Send Successfully.")
-        return HttpResponseRedirect(request.path_info)
+        return Response({
+            'status': status.HTTP_200_OK,
+            'message': 'Notifications sent to chefs successfully.'
+        }, status=status.HTTP_200_OK)
 
 
-    return render(request , "manager/notifications_to_chefs.html")
+class SendNotificationToUser(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        username = request.data.get('username')
+        title = request.data.get('title')
+        message = request.data.get('message')
 
-@staff_member_required(login_url='error500')
-def send_notification_to_user(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        title = request.POST.get('title')
-        message = request.POST.get('message')
+        if not username or not title or not message:
+            return Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': 'Username, title, and message are required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        #Create new notification
-        create_new_notification = Notification( 
-            sender = "Admin",
-            username = username,
-            title = title,
-            message = message,
-            )
-        create_new_notification.save()
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({
+                'status': status.HTTP_404_NOT_FOUND,
+                'message': 'User not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
 
-        messages.success(request, "Send Successfully.")
-        return HttpResponseRedirect(request.path_info)
+        # Create new notification
+        Notification.objects.create(
+            sender="Admin",
+            username=username,
+            title=title,
+            message=message,
+        )
 
-    return render(request , "manager/notifications_to_user.html")
+        return Response({
+            'status': status.HTTP_200_OK,
+            'message': 'Notification sent successfully.'
+        }, status=status.HTTP_200_OK)
