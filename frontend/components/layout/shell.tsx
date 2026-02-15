@@ -8,8 +8,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  // Don't show the sidebar on the root (home) path
-  const showSidebar = pathname !== "/"
+  const noSidebarRoutes = new Set(["/", "/login", "/signup"])
+  const showSidebar = !noSidebarRoutes.has(pathname)
 
   if (!showSidebar) return <>{children}</>
 

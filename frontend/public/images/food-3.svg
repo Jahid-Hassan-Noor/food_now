@@ -1,0 +1,19 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wok Night Chow Mein">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="100%" stop-color="#A7F3D0"/>
+    </linearGradient>
+    <radialGradient id="plate3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#E2E8F0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" rx="48" fill="url(#bg3)"/>
+  <circle cx="400" cy="350" r="190" fill="url(#plate3)"/>
+  <path d="M280 340 C340 280 460 280 520 340" stroke="#F97316" stroke-width="28" stroke-linecap="round" fill="none"/>
+  <path d="M300 380 C360 320 470 330 500 390" stroke="#FBBF24" stroke-width="24" stroke-linecap="round" fill="none"/>
+  <circle cx="360" cy="320" r="26" fill="#22C55E"/>
+  <circle cx="470" cy="360" r="22" fill="#16A34A"/>
+  <rect x="130" y="150" width="130" height="18" rx="9" fill="#FFFFFF" opacity="0.7"/>
+</svg>

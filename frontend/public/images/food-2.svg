@@ -1,0 +1,21 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chai and Cardamom Donuts">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FBCFE8"/>
+      <stop offset="100%" stop-color="#DDD6FE"/>
+    </linearGradient>
+    <radialGradient id="plate2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF7ED"/>
+      <stop offset="100%" stop-color="#FDF2F8"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" rx="48" fill="url(#bg2)"/>
+  <circle cx="400" cy="340" r="180" fill="url(#plate2)"/>
+  <circle cx="340" cy="320" r="62" fill="#FDBA74"/>
+  <circle cx="340" cy="320" r="28" fill="#FCE7F3"/>
+  <circle cx="480" cy="340" r="70" fill="#F9A8D4"/>
+  <circle cx="480" cy="340" r="32" fill="#FCE7F3"/>
+  <circle cx="410" cy="400" r="46" fill="#C4B5FD"/>
+  <circle cx="410" cy="400" r="20" fill="#FCE7F3"/>
+  <rect x="520" y="130" width="110" height="18" rx="9" fill="#FFFFFF" opacity="0.75"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Comfort Dal Bowl">
+  <defs>
+    <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FED7AA"/>
+      <stop offset="100%" stop-color="#BBF7D0"/>
+    </linearGradient>
+    <radialGradient id="plate4" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF7ED"/>
+      <stop offset="100%" stop-color="#E5E7EB"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" rx="48" fill="url(#bg4)"/>
+  <circle cx="400" cy="340" r="190" fill="url(#plate4)"/>
+  <circle cx="400" cy="340" r="140" fill="#FACC15" opacity="0.3"/>
+  <circle cx="350" cy="320" r="36" fill="#F97316"/>
+  <circle cx="450" cy="360" r="46" fill="#FDBA74"/>
+  <circle cx="420" cy="300" r="20" fill="#16A34A"/>
+  <rect x="560" y="160" width="120" height="18" rx="9" fill="#FFFFFF" opacity="0.75"/>
+</svg>

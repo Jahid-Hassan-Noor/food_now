@@ -1,0 +1,15 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spicy Samosa Pack">
+  <defs>
+    <linearGradient id="bg6" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FBCFE8"/>
+      <stop offset="100%" stop-color="#FDE68A"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" rx="48" fill="url(#bg6)"/>
+  <polygon points="260,380 360,220 460,380" fill="#F97316"/>
+  <polygon points="320,380 420,220 520,380" fill="#FB923C"/>
+  <polygon points="220,380 320,220 420,380" fill="#FDBA74"/>
+  <circle cx="500" cy="320" r="40" fill="#22C55E"/>
+  <circle cx="560" cy="350" r="22" fill="#16A34A"/>
+  <rect x="520" y="160" width="120" height="18" rx="9" fill="#FFFFFF" opacity="0.75"/>
+</svg>
