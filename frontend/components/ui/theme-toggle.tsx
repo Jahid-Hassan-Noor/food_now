@@ -19,7 +19,7 @@ export function ThemeToggle() {
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
       setTheme(prefersDark ? "dark" : "light")
       document.documentElement.classList.toggle("dark", prefersDark)
-    } catch (e) {
+    } catch {
       // ignore (SSR safety)
     }
   }, [])
@@ -30,7 +30,7 @@ export function ThemeToggle() {
     try {
       document.documentElement.classList.toggle("dark", next === "dark")
       localStorage.setItem("theme", next)
-    } catch (e) {
+    } catch {
       // ignore
     }
   }

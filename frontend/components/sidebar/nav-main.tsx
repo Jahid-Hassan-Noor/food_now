@@ -1,19 +1,17 @@
 "use client"
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useMemo, useState } from "react"
 import { usePathname } from "next/navigation"
 
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -36,11 +34,10 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
-  
-  // Find which menu item should be open based on current path
-  const getActiveMenuTitle = () => {
+
+  const activeMenuTitle = useMemo(() => {
     for (const item of items) {
-      if (item.items?.some(subItem => pathname === subItem.url || pathname.startsWith(subItem.url + "/"))) {
+      if (item.items?.some((subItem) => pathname === subItem.url || pathname.startsWith(subItem.url + "/"))) {
         return item.title
       }
       if (pathname === item.url || pathname.startsWith(item.url + "/")) {
@@ -48,23 +45,17 @@ export function NavMain({
       }
     }
     return null
-  }
+  }, [items, pathname])
 
   const [openItems, setOpenItems] = useState<string[]>([])
 
-  useEffect(() => {
-    const activeTitle = getActiveMenuTitle()
-    if (activeTitle) {
-      setOpenItems([activeTitle])
-    }
-  }, [pathname])
-
-  const toggleItem = (title: string) => {
-    setOpenItems(prev =>
-      prev.includes(title)
-        ? prev.filter(t => t !== title)
-        : [...prev, title]
-    )
+  const setItemOpen = (title: string, nextOpen: boolean) => {
+    setOpenItems((prev) => {
+      if (nextOpen) {
+        return prev.includes(title) ? prev : [...prev, title]
+      }
+      return prev.filter((itemTitle) => itemTitle !== title)
+    })
   }
 
   const isSubItemActive = (url: string) => {
@@ -75,18 +66,33 @@ export function NavMain({
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible key={item.title} open={openItems.includes(item.title)} onOpenChange={() => item.items?.length && toggleItem(item.title)}>
+        {items.map((item) => {
+          const isOpen = openItems.includes(item.title) || activeMenuTitle === item.title
+
+          return (
+          <Collapsible
+            key={item.title}
+            open={isOpen}
+            onOpenChange={(nextOpen) => {
+              if (item.items?.length) {
+                setItemOpen(item.title, nextOpen)
+              }
+            }}
+          >
             <SidebarMenuItem>
-              <SidebarMenuButton 
-                onClick={() => item.items?.length && toggleItem(item.title)}
+              <SidebarMenuButton
+                onClick={() => {
+                  if (item.items?.length) {
+                    setItemOpen(item.title, !isOpen)
+                  }
+                }}
                 render={!item.items?.length ? <a href={item.url} /> : undefined}
                 tooltip={item.title}
               >
                 <item.icon />
                 <span>{item.title}</span>
                 {item.items?.length ? (
-                  <ChevronRight className={`ml-auto transition-transform duration-200 ${openItems.includes(item.title) ? "rotate-90" : ""}`} />
+                  <ChevronRight className={`ml-auto transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
                 ) : null}
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -100,14 +106,15 @@ export function NavMain({
                         className={isSubItemActive(subItem.url) ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
                       >
                         <span>{subItem.title}</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
                     ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              ) : null}
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            ) : null}
           </Collapsible>
-        ))}
+          )
+        })}
       </SidebarMenu>
     </SidebarGroup>
   )

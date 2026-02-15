@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.mail import send_mail
+from core.settings import EMAIL_HOST_USER, EMAIL_HOST, EMAIL_PORT
 
 
 def send_account_activation_email( email , email_token, current_site):
@@ -13,6 +14,9 @@ def send_account_activation_email( email , email_token, current_site):
 def send_password_reset_email( email , password_reset_token, current_site):
     subject = "Your Password Reset Link."
     email_from = settings.EMAIL_HOST_USER
-    message = F'Hi, It is your password link. Click on the link to reset your password {current_site}/password_reset/{password_reset_token}'
+    message = (
+        "Hi, this is your password reset link. "
+        f"Click here to reset your password: {current_site}/reset-password?token={password_reset_token}"
+    )
 
     send_mail(subject, message , email_from , [email])
