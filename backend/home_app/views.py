@@ -4,6 +4,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 from user_app.models import Campaign, Food, Chef, Order
 from admin_app.models import Profile
 from django.contrib.auth.models import User
@@ -14,11 +15,16 @@ class home(APIView):
     def get(self, request):
         now = timezone.now()
         # Running campaigns
-        running_campaigns = Campaign.objects.filter(status="running", start_time__lte=now, end_time__gte=now, quantity_available__gte=1).order_by('-start_time')
+        running_campaigns = Campaign.objects.filter(
+            Q(status="running")
+            & Q(start_time__lte=now)
+            & (Q(end_time__gte=now) | Q(end_time__isnull=True))
+            & Q(quantity_available__gte=1)
+        ).order_by('-start_time')
         campaigns_data = []
         for campaign in running_campaigns:
             food_items = []
-            food_quantities = campaign.food_quantities or {}
+            food_quantities = campaign.food_items or {}
             for fid, quantity in food_quantities.items():
                 try:
                     food = Food.objects.get(pk=fid)
@@ -67,5 +73,4 @@ class home(APIView):
             'statistics': stats,
             'status': status.HTTP_200_OK,
         })
-
 

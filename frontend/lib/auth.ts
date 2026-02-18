@@ -55,9 +55,11 @@ const ROLE_RULES: Array<{ prefix: string; role: UserRole }> = [
   { prefix: "/subscription/pending", role: "admin" },
   { prefix: "/subscription/options", role: "admin" },
   { prefix: "/subscription/history", role: "admin" },
+  { prefix: "/user-feedbacks", role: "admin" },
   { prefix: "/dashboard/chef", role: "chef" },
   { prefix: "/campaign-orders", role: "chef" },
   { prefix: "/campaign", role: "chef" },
+  { prefix: "/food-inventory", role: "chef" },
   { prefix: "/subscription/get", role: "chef" },
   { prefix: "/subscription", role: "chef" },
   { prefix: "/dashboard/user", role: "user" },
@@ -99,20 +101,43 @@ function isTokenExpired(token: string, skewSeconds = 15): boolean {
   return payload.exp <= now + skewSeconds
 }
 
+function safeJsonParse(text: string): unknown | null {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
+function extractErrorMessage(data: unknown, fallback: string): string {
+  if (data && typeof data === "object") {
+    const maybeDetail = (data as { detail?: unknown }).detail
+    if (typeof maybeDetail === "string" && maybeDetail.trim()) return maybeDetail
+
+    const maybeMessage = (data as { message?: unknown }).message
+    if (typeof maybeMessage === "string" && maybeMessage.trim()) return maybeMessage
+  }
+  return fallback
+}
+
 async function requestJson<T>(path: string, init: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, init)
   const text = await response.text()
-  const data = text ? JSON.parse(text) : {}
+  const data = text ? safeJsonParse(text) : {}
 
   if (!response.ok) {
-    const detail =
-      (typeof data?.detail === "string" && data.detail) ||
-      (typeof data?.message === "string" && data.message) ||
-      "Request failed"
-    throw new Error(detail)
+    const fallback =
+      text.trim().startsWith("<")
+        ? `Server returned HTML error page (${response.status}). Check backend logs.`
+        : "Request failed"
+    throw new Error(extractErrorMessage(data, fallback))
   }
 
-  return data as T
+  if (text && data === null) {
+    throw new Error("Server returned invalid JSON.")
+  }
+
+  return (data ?? {}) as T
 }
 
 export function normalizeRole(role: string | null | undefined): UserRole {
@@ -307,25 +332,31 @@ export async function apiFetch<T>(endpoint: string, init?: RequestInit): Promise
     throw new Error("Session expired. Please login again.")
   }
 
+  const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData
+
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${session.access}`,
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(init?.headers ?? {}),
     },
   })
 
   const text = await response.text()
-  const data = text ? JSON.parse(text) : {}
+  const data = text ? safeJsonParse(text) : {}
 
   if (!response.ok) {
-    const detail =
-      (typeof data?.detail === "string" && data.detail) ||
-      (typeof data?.message === "string" && data.message) ||
-      "API request failed"
-    throw new Error(detail)
+    const fallback =
+      text.trim().startsWith("<")
+        ? `Server returned HTML error page (${response.status}). Check backend logs.`
+        : "API request failed"
+    throw new Error(extractErrorMessage(data, fallback))
   }
 
-  return data as T
+  if (text && data === null) {
+    throw new Error("Server returned invalid JSON.")
+  }
+
+  return (data ?? {}) as T
 }

@@ -5,13 +5,13 @@ from django.contrib import admin
 from user_app.models import *
 
 class ChefAdmin(admin.ModelAdmin):
-    readonly_fields = ('subscription_ends', )
+    readonly_fields = ('uid', )
 
 class CampaignAdmin(admin.ModelAdmin):
-    readonly_fields = ('start_time', 'end_time', 'delivery_time', )
+    readonly_fields = ('uid', )
 
 class Campaign_historyAdmin(admin.ModelAdmin):
-    readonly_fields = ('start_time', 'end_time', 'delivery_time', )
+    readonly_fields = ('uid', )
 
 class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('order_time', 'uid', )

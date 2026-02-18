@@ -2,7 +2,7 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
 import { useMemo, useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 import {
   Collapsible,
@@ -34,6 +34,7 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
+  const router = useRouter()
 
   const activeMenuTitle = useMemo(() => {
     for (const item of items) {
@@ -67,6 +68,17 @@ export function NavMain({
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
+          if (!item.items?.length) {
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton onClick={() => router.push(item.url)} tooltip={item.title}>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          }
+
           const isOpen = openItems.includes(item.title) || activeMenuTitle === item.title
 
           return (
@@ -82,36 +94,29 @@ export function NavMain({
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => {
-                  if (item.items?.length) {
-                    setItemOpen(item.title, !isOpen)
-                  }
+                  setItemOpen(item.title, !isOpen)
                 }}
-                render={!item.items?.length ? <a href={item.url} /> : undefined}
                 tooltip={item.title}
               >
                 <item.icon />
                 <span>{item.title}</span>
-                {item.items?.length ? (
-                  <ChevronRight className={`ml-auto transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
-                ) : null}
+                <ChevronRight className={`ml-auto transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {item.items?.length ? (
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton 
-                        render={<a href={subItem.url} />}
-                        className={isSubItemActive(subItem.url) ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
-                      >
-                        <span>{subItem.title}</span>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            ) : null}
+            <CollapsibleContent>
+              <SidebarMenuSub>
+                {item.items.map((subItem) => (
+                  <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubButton
+                      render={<a href={subItem.url} />}
+                      className={isSubItemActive(subItem.url) ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
+                    >
+                      <span>{subItem.title}</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            </CollapsibleContent>
           </Collapsible>
           )
         })}

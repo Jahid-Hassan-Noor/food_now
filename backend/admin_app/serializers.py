@@ -128,3 +128,9 @@ class UserSerializer(serializers.ModelSerializer):
             return profile.role
         except Profile.DoesNotExist:
             return "user"
+
+
+class User_feedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User_feedback
+        fields = '__all__'

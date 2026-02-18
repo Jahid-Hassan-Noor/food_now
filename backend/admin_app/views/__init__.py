@@ -9,3 +9,4 @@ from admin_app.views.subscriptions import *
 from admin_app.views.transactions import *
 from admin_app.views.users import *
 from admin_app.views.account import *
+from admin_app.views.user_feedbacks import *

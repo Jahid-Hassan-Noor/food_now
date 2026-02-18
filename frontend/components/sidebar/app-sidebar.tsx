@@ -2,17 +2,16 @@
 
 import * as React from "react"
 import {
-  BookOpen,
-  Bell,
-  Bot,
+  ClipboardList,
   Command,
-  Frame,
+  CreditCard,
   LifeBuoy,
-  Map,
+  Megaphone,
+  Package,
   PieChart,
+  Receipt,
   Send,
-  SquareTerminal,
-  UserCircle,
+  ShoppingBag,
   type LucideIcon,
 } from "lucide-react"
 
@@ -80,7 +79,7 @@ const data = {
     {
       title: "Campaign",
       url: "/campaign",
-      icon: Bot,
+      icon: Megaphone,
       requiredRole: "chef",
       items: [
         {
@@ -103,7 +102,7 @@ const data = {
     {
       title: "Campaign Orders",
       url: "/campaign-orders",
-      icon: SquareTerminal,
+      icon: ClipboardList,
       requiredRole: "chef",
       items: [
         {
@@ -121,7 +120,7 @@ const data = {
     {
       title: "Your Orders",
       url: "/your-orders",
-      icon: Frame,
+      icon: ShoppingBag,
       requiredRole: "user",
       items: [
         {
@@ -139,7 +138,7 @@ const data = {
     {
       title: "Subscription",
       url: "/subscription",
-      icon: BookOpen,
+      icon: CreditCard,
       requiredRole: "chef",
       items: [
         {
@@ -167,7 +166,7 @@ const data = {
     {
       title: "Transactions",
       url: "/transactions",
-      icon: Map,
+      icon: Receipt,
       requiredRole: "admin",
       items: [
         {
@@ -183,10 +182,28 @@ const data = {
       ],
     },
     {
-      title: "Notifications",
-      url: "/notifications",
-      icon: Bell,
-      requiredRole: "user",
+      title: "Food Inventory",
+      url: "/food-inventory",
+      icon: Package,
+      requiredRole: "chef",
+      items: [
+        {
+          title: "Listed Foods",
+          url: "/food-inventory/listed-foods",
+          requiredRole: "chef",
+        },
+        {
+          title: "Add Food Items",
+          url: "/food-inventory/add-items",
+          requiredRole: "chef",
+        },
+      ],
+    },
+    {
+      title: "User Feedbacks",
+      url: "/user-feedbacks",
+      icon: Send,
+      requiredRole: "admin",
     },
   ],
   navSecondary: [

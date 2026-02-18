@@ -45,9 +45,12 @@ class Pending_transaction(core_model):
     status = models.CharField(max_length=100, default="active")
     chef = models.CharField(max_length=100, default="chef username")
     type = models.CharField(max_length=100, default="Transaction Type")
+    subscription_option_id = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    subscription_option_name = models.CharField(max_length=150, blank=True, null=True)
+    subscription_duration_months = models.PositiveIntegerField(null=True, blank=True)
     transaction_description = models.TextField(blank=True, null=True)
     transaction_proof = models.ImageField(upload_to='transaction_proofs/')
-    transaction_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    transaction_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True, db_index=True)
     amount = models.FloatField(null=True, blank=True, default=0.0)
 
     def __str__(self):
@@ -58,10 +61,13 @@ class Transaction_history(core_model):
     status = models.CharField(max_length=100, default="active")
     chef = models.CharField(max_length=100, default="chef username")
     type = models.CharField(max_length=100, default="Transaction Type")
+    subscription_option_id = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    subscription_option_name = models.CharField(max_length=150, blank=True, null=True)
+    subscription_duration_months = models.PositiveIntegerField(null=True, blank=True)
     transaction_description = models.TextField(blank=True, null=True)
     transaction_proof = models.ImageField(upload_to='transaction_proofs/')
     transaction_id = models.TextField(blank=True, null=True, default="Transaction UID")
-    transaction_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    transaction_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True, db_index=True)
     amount = models.FloatField(null=True, blank=True, default=0.0)
 
     def __str__(self):
@@ -88,3 +94,68 @@ class Subscription_option(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.duration_months} months)"
+
+
+class Dashboard_report_schedule(models.Model):
+    FREQUENCY_WEEKLY = "weekly"
+    FREQUENCY_MONTHLY = "monthly"
+    FREQUENCY_CHOICES = (
+        (FREQUENCY_WEEKLY, "Weekly"),
+        (FREQUENCY_MONTHLY, "Monthly"),
+    )
+
+    email = models.EmailField(unique=True)
+    frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, default=FREQUENCY_WEEKLY)
+    is_active = models.BooleanField(default=True)
+    next_run_at = models.DateTimeField(default=now, db_index=True)
+    last_sent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.email} ({self.frequency})"
+
+
+class User_feedback(core_model):
+    CATEGORY_SUPPORT = "support"
+    CATEGORY_FEEDBACK = "feedback"
+    CATEGORY_CHOICES = (
+        (CATEGORY_SUPPORT, "Support"),
+        (CATEGORY_FEEDBACK, "Feedback"),
+    )
+
+    PRIORITY_LOW = "low"
+    PRIORITY_NORMAL = "normal"
+    PRIORITY_HIGH = "high"
+    PRIORITY_CHOICES = (
+        (PRIORITY_LOW, "Low"),
+        (PRIORITY_NORMAL, "Normal"),
+        (PRIORITY_HIGH, "High"),
+    )
+
+    STATUS_OPEN = "open"
+    STATUS_IN_REVIEW = "in_review"
+    STATUS_RESOLVED = "resolved"
+    STATUS_CHOICES = (
+        (STATUS_OPEN, "Open"),
+        (STATUS_IN_REVIEW, "In Review"),
+        (STATUS_RESOLVED, "Resolved"),
+    )
+
+    user = models.CharField(max_length=150, db_index=True)
+    email = models.EmailField(blank=True, null=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default=CATEGORY_FEEDBACK, db_index=True)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    rating = models.PositiveSmallIntegerField(blank=True, null=True)
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default=PRIORITY_NORMAL, db_index=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPEN, db_index=True)
+    admin_notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.category} - {self.user} - {self.subject[:40]}"

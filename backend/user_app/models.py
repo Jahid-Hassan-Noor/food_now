@@ -2,6 +2,7 @@
 
 
 from django.db import models
+from django.utils import timezone
 from core.models import core_model
 
 
@@ -15,11 +16,19 @@ class Campaign(core_model):
     title = models.CharField(max_length=100, default="Campaign Title")
     campaign_description = models.TextField(blank=True, null=True)
     food_items = models.JSONField(default=dict, blank=True, null=True)
-    start_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    end_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    delivery_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    start_time = models.DateTimeField(default=timezone.now, null=True, blank=True, editable=True, db_index=True)
+    end_time = models.DateTimeField(null=True, blank=True, editable=True)
+    delivery_time = models.DateTimeField(null=True, blank=True, editable=True)
     quantity_available = models.IntegerField(default=0)
     total_orders = models.IntegerField(default=0)
+
+    @property
+    def food_quantities(self):
+        return self.food_items or {}
+
+    @food_quantities.setter
+    def food_quantities(self, value):
+        self.food_items = value or {}
 
     def __str__(self):
         return self.title
@@ -31,9 +40,9 @@ class Campaign_history(core_model):
     title = models.CharField(max_length=100, default="Campaign Title")
     campaign_description = models.TextField(blank=True, null=True)
     food_ids = models.TextField(blank=True, null=True, default="Food IDs(comma separated)")
-    start_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    end_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
-    delivery_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    start_time = models.DateTimeField(default=timezone.now, null=True, blank=True, editable=True, db_index=True)
+    end_time = models.DateTimeField(null=True, blank=True, editable=True)
+    delivery_time = models.DateTimeField(null=True, blank=True, editable=True)
     total_orders = models.IntegerField(default=0)
 
     def __str__(self):
@@ -49,7 +58,7 @@ class Chef(core_model):
     total_deposit = models.IntegerField(default=0)
     total_campaigns = models.IntegerField(default=0 , blank=True, null=True)
     subscription_status = models.CharField(max_length=50, default="Expired")
-    subscription_ends = models.DateTimeField(auto_now_add=True, null=True, blank=True, editable=True)
+    subscription_ends = models.DateTimeField(null=True, blank=True, editable=True)
     campaign_points = models.IntegerField(default=0, blank=True, null=True)
     last_month_sales = models.FloatField(default=0.0, blank=True, null=True)
     this_month_sales = models.FloatField(default=0.0, blank=True, null=True)
@@ -90,7 +99,7 @@ class Order(core_model):
     food_items = models.TextField(blank=True, null=True)
     custom_order_details = models.TextField(blank=True, null=True)
     food_price = models.FloatField(default=0)
-    order_time = models.DateTimeField(auto_now_add=True)
+    order_time = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
         return f"{self.uid}"
@@ -103,7 +112,7 @@ class Order_history(core_model):
     food_items = models.TextField(blank=True, null=True)
     food_price = models.FloatField(default=0)
     order_id = models.CharField(max_length=200, null = True, blank = True)
-    order_time = models.DateTimeField(auto_now_add=True)
+    order_time = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
         return self.order_id

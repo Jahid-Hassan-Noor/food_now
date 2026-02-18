@@ -12,8 +12,8 @@ urlpatterns = [
     path('auth/forgot-password/', forgot_password.as_view()),
     path('auth/reset-password/', reset_password.as_view()),
     path('auth/token/refresh/', TokenRefreshView.as_view()),
+    path('admin/', include('admin_app.urls')),
     path('', include('home_app.urls')),
-    # path('admin/', include('admin_app.urls')),
     path('', include('user_app.urls')),
     # path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
